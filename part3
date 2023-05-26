@@ -1,0 +1,35 @@
+ts <- read.csv("LPI_timeseries_wlogdiff.csv")
+#view the data and structure
+View(ts)
+str(ts)
+info <- read.csv("LPI_pop_info.csv")
+View(info)
+str(info)
+
+# Calculate mean log-difference for each population
+means = aggregate(ts$logpop~as.factor(ts$id), FUN=mean)
+colnames(means) = c("id","pop.growth")
+means
+
+# Combine the datasets
+LPI = merge(info, means, by = "id")
+View(LPI)
+# Install the car package
+install.packages("car")
+# Load the package
+library(car)
+# Mean population growth of each region
+tapply(X = LPI$pop.growth, INDEX = LPI$Region, FUN = mean)
+
+
+# ANOVA predicting population growth from region
+glm = lm(pop.growth ~ Region, data=LPI)
+Anova(glm, type = 3)
+install.packages("ggplot2")
+# Load ggplot2
+library(ggplot2)
+# Boxplot
+ggplot(data=LPI) +
+  geom_boxplot(mapping = aes(x=Region, y = pop.growth),
+               fill = "coral1") +
+  labs(y = "Population growth (mean log-difference)")
