@@ -1,0 +1,42 @@
+#loading data set
+movies <- read.csv("movies.csv")
+View(movies)
+#Assigning better column names to ensure consistency 
+names(movies)[5]<- "ONE LINE SUMMARY"
+names(movies)[8]<- "RUN TIME (min)"
+names(movies)[9]<- "GROSS" 
+#keep only one genre classification for aggregation purposes
+movies$GENRE <- gsub(",.*", "", movies$GENRE)
+#clean GENRE column
+movies$GENRE <- trimws(movies$GENRE)
+View(movies)
+#remove entries with missing values
+#a: some movies do not contain a plot--we do not want these
+movies <- movies[!grepl('Add a Plot', movies$`ONE LINE SUMMARY`),]
+View(movies)
+#b: replacing empty string columns with NA for later analysis
+movies$MOVIES[movies$MOVIES == ''] <- NA
+movies$YEAR[movies$YEAR == ''] <- NA
+movies$GENRE[movies$GENRE == ''] <- NA
+movies$`ONE LINE SUMMARY`[movies$`ONE LINE SUMMARY` == ''] <- NA
+movies$STARS[movies$STARS == ''] <- NA
+movies$VOTES[movies$VOTES == ''] <- NA
+movies$GROSS[movies$GROSS == ''] <- NA
+View(movies)
+#now, we are ready to remove all the incomplete rows!
+complete.cases(movies)       
+summary(movies)
+#rating, votes, run-time, and gross should be numerical values, but votes, and gross are not: must convert them
+#lets convert "VOTES" column to numeric values
+movies$VOTES<- as.numeric(gsub(",","", movies$VOTES))
+#lets convert "GROSS" column to numeric values
+movies$GROSS<- gsub("\\$","", movies$GROSS)
+movies$GROSS <- gsub("M", "", movies$GROSS)
+names(movies)[9]<- "GROSS ($M)" 
+View(movies)
+movies <- na.omit(movies)
+View(movies)
+#Data aggregation step: classify movies by genre and their mean rating
+aggregate(x = movies$RATING, by = list(movies$GENRE), FUN = mean)
+View(movies)
+write.csv(movies,"C:\\Users\\anika\\OneDrive\\MYM\\cleanedmovies.csv")
