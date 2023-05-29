@@ -9,22 +9,30 @@ df = pd.read_csv(r'C:\Users\anika\OneDrive\MYM\7004_1.csv', on_bad_lines='skip',
 df['brand'] = df['brand'].str.lower()
 #we only want to look at shoes given in USD for consistency
 df = df[df["prices.currency"].str.contains("USD")==True]
-#we only want to look at new shoes
+#we only want to look at new shoes with box
 df = df[df["prices.condition"].str.contains("new|New")==True]
+#calculating the mean, median, and standard deviation of minimum price based on brand
 #ensure that all min values are indeed numeric before performing calculations
 df["prices.amountMin"] = pd.to_numeric(df["prices.amountMin"], downcast="float")
-#obtaining mean, median, and standard deviation calculations
+#calculating the mean, median, and standard deviation of minimum price based on brand
 print(df.groupby('brand')['prices.amountMin'].mean())
 print(df.groupby('brand')['prices.amountMin'].median())
 print(df.groupby('brand')['prices.amountMin'].std())
 #rename column names 
 df = df.rename(columns={"prices.amountMin":"Minimum Price ($)", "brand":"Brand", "prices.isSale": "Sale"})
-#sample size of 30 for graph purposes
 df = df.sample(n=30)
+#bar chart
+sns.set_theme(style='darkgrid', rc={'figure.dpi': 147},              
+              font_scale=0.7)
+fig, ax = plt.subplots(figsize=(7, 2))
+ax.set_title("Mean Minimum Price of Men's Shoe Brands")
 chart = sns.barplot(x='Brand', y='Minimum Price ($)', data=df, ci = None)
-plt.figure(figsize=(17,8))
+ax.set_xticklabels(ax.get_xticklabels(), rotation=90)
+plt.xticks(fontsize=7)
+ax.figure
 for p in chart.patches:
-    chart.annotate("%.0f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
-    ha='center', va='center', fontsize=13, color='black', xytext=(0, 10),
+    chart.annotate("%.1f" % p.get_height(), (p.get_x() + p.get_width() / 2., p.get_height()),
+    ha='center', va='center', fontsize=5, color='black', xytext=(0, 10),
     textcoords='offset points')
+plt.savefig('fixed_imagee', bbox_inches='tight')
 plt.show()
