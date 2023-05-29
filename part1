@@ -7,29 +7,20 @@ import seaborn as sns
 df = pd.read_csv(r'C:\Users\anika\OneDrive\MYM\7004_1.csv', on_bad_lines='skip', low_memory = False)
 #lower case brand names for consistency
 df['brand'] = df['brand'].str.lower()
-#we are going to zoom into 5 sports brands
-#df = df[df['brand'].eq('adidas').any()==True] and df[df['brand'].eq('nike').any()==True]
-#df = df[df["brand"].str.contains("adidas")==True] 
 #we only want to look at shoes given in USD for consistency
 df = df[df["prices.currency"].str.contains("USD")==True]
-#we only want to look at new shoes with box
+#we only want to look at new shoes
 df = df[df["prices.condition"].str.contains("new|New")==True]
-#calculating the mean, median, and standard deviation of minimum price based on brand
 #ensure that all min values are indeed numeric before performing calculations
 df["prices.amountMin"] = pd.to_numeric(df["prices.amountMin"], downcast="float")
+#obtaining mean, median, and standard deviation calculations
 print(df.groupby('brand')['prices.amountMin'].mean())
 print(df.groupby('brand')['prices.amountMin'].median())
 print(df.groupby('brand')['prices.amountMin'].std())
 #rename column names 
 df = df.rename(columns={"prices.amountMin":"Minimum Price ($)", "brand":"Brand", "prices.isSale": "Sale"})
+#sample size of 30 for graph purposes
 df = df.sample(n=30)
-#box_plot = sns.boxplot(x="Brand",y="Minimum Price ($)",data=df)
-#medians = df.groupby(['Brand'])['Minimum Price ($)'].median()
-#vertical_offset = df['Minimum Price ($)'].median() * 0.05 # offset from median for display
-#for xtick in box_plot.get_xticks():
-    #box_plot.text(xtick,medians[xtick] + vertical_offset,medians[xtick], 
-            #horizontalalignment='center',size='x-small',color='w',weight='semibold')
-#sns.catplot(data=df, x="Brand", y="Minimum Price ($)", kind = "bar")
 chart = sns.barplot(x='Brand', y='Minimum Price ($)', data=df, ci = None)
 plt.figure(figsize=(17,8))
 for p in chart.patches:
