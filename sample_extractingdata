@@ -1,0 +1,33 @@
+import pymongo
+import pandas as pd
+
+#establishing the connection between MongoDB and Python
+client = pymongo.MongoClient("mongodb://localhost:27017")
+
+#identifying the database we want to read from
+db = client["populations"]
+
+#identifying the collection we want to read from
+mycollection = db["cities"]
+
+#fetching one record from our collection
+one_record = mycollection.find_one()
+print(one_record)
+
+#fetching all the records from our collection
+all_records = mycollection.find()
+print(all_records)
+#run a for loop here to extract from cursor
+for row in all_records:
+    print(row)
+
+#convert cursor into list
+all_records = mycollection.find()
+print(all_records)
+list_cursor = list(all_records)
+print(list_cursor)
+#now we should have a list of dictionaries
+#now we should have a dataframe
+df = pd.DataFrame(list_cursor)
+df.head()
+df.tail()
